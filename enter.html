@@ -92,14 +92,18 @@
     const joinBtn = document.getElementById('join-btn');
 
     // 1. IP 기반 국가 코드 가져오기
+    // enter.html의 script 부분
     fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-            nationInput.value = data.country_code || "KR";
-        })
-        .catch(() => {
-            nationInput.value = "KR"; // 실패 시 기본값
-        });
+    .then(res => res.json())
+    .then(data => {
+        nationInput.value = data.country_code || "KR";
+        // 사용자의 IP 주소를 로컬 스토리지에 임시 저장
+        localStorage.setItem('user_ip', data.ip); 
+    })
+    .catch(() => {
+        nationInput.value = "KR";
+        localStorage.setItem('user_ip', 'unknown');
+    });
 
     // 2. Join 버튼 클릭 이벤트
     joinBtn.addEventListener('click', () => {
