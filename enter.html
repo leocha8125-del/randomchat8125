@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join - Modern random chat world</title>
+    <style>
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; 
+        }
+        .container { 
+            width: 95%; max-width: 600px; background: white; 
+            border-radius: 24px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid #eef0f2;
+        }
+        h2 { text-align: center; margin-bottom: 30px; color: #1a202c; }
+
+        /* 이용약관 영역 */
+        .terms-box {
+            width: 100%; height: 150px; border: 2px solid #e2e8f0;
+            border-radius: 12px; padding: 15px; margin-bottom: 25px;
+            overflow-y: auto; background-color: #f8fafc; font-size: 0.9rem; color: #64748b;
+        }
+
+        /* 입력 라벨 및 창 */
+        .input-group { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
+        .label-box { 
+            width: 120px; padding: 12px; background: #edf2f7; 
+            border: 2px solid #cbd5e0; border-radius: 12px; 
+            text-align: center; font-weight: bold; font-size: 0.9rem;
+        }
+        .input-box { 
+            flex-grow: 1; padding: 12px 15px; border: 2px solid #e2e8f0; 
+            border-radius: 12px; outline: none; font-size: 1rem;
+        }
+        .input-box:focus { border-color: #007bff; }
+
+        /* 하단 동의 및 버튼 */
+        .bottom-area { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        .agree-check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; }
+        .agree-check input { width: 20px; height: 20px; cursor: pointer; }
+
+        /* 입체적 Join 버튼 */
+        #join-btn {
+            padding: 0 40px; height: 54px; background-color: #007bff; color: white;
+            border: 2px solid #0056b3; border-radius: 16px; font-weight: 700;
+            font-size: 1.1rem; cursor: pointer; position: relative; top: 0;
+            box-shadow: 0 4px 0 #004a99; transition: all 0.05s;
+        }
+        #join-btn:hover { background-color: #0069d9; }
+        #join-btn:active, #join-btn.is-active {
+            top: 4px; box-shadow: 0 0 0 #004a99; background-color: #0056b3;
+        }
+        #join-btn:disabled { background-color: #cbd5e0; border-color: #a0aec0; box-shadow: none; cursor: not-serif; top: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Modern random chat world</h2>
+    
+    <div class="terms-box">
+        <strong>Terms and Conditions:</strong><br><br>
+        이용약관 내용이 이곳에 들어갈 예정입니다. 현재는 테스트 중입니다.
+    </div>
+
+    <div class="input-group">
+        <div class="label-box">Nationality</div>
+        <input type="text" id="nationality" class="input-box" placeholder="Loading...">
+    </div>
+
+    <div class="input-group">
+        <div class="label-box">Nick Name</div>
+        <input type="text" id="nickname" class="input-box" placeholder="Enter your nickname">
+    </div>
+
+    <div class="bottom-area">
+        <label class="agree-check">
+            <input type="checkbox" id="agree"> I agree
+        </label>
+        <button id="join-btn">Join</button>
+    </div>
+</div>
+
+<script>
+    const nationInput = document.getElementById('nationality');
+    const nickInput = document.getElementById('nickname');
+    const agreeCheck = document.getElementById('agree');
+    const joinBtn = document.getElementById('join-btn');
+
+    // 1. IP 기반 국가 코드 가져오기
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            nationInput.value = data.country_code || "KR";
+        })
+        .catch(() => {
+            nationInput.value = "KR"; // 실패 시 기본값
+        });
+
+    // 2. Join 버튼 클릭 이벤트
+    joinBtn.addEventListener('click', () => {
+        if (!agreeCheck.checked) {
+            alert("이용약관에 동의해주세요.");
+            return;
+        }
+        if (nickInput.value.trim() === "" || nationInput.value.trim() === "") {
+            alert("국적과 닉네임을 모두 입력해주세요.");
+            return;
+        }
+
+        // 데이터 저장 (다음 화면에서 쓰기 위해)
+        localStorage.setItem('chat_nickname', nickInput.value.trim());
+        localStorage.setItem('chat_nationality', nationInput.value.trim());
+
+        // 버튼 눌림 효과 후 이동
+        joinBtn.classList.add('is-active');
+        setTimeout(() => {
+            window.location.href = 'chat.html'; // 채팅 페이지로 이동
+        }, 150);
+    });
+</script>
+
+</body>
+</html>

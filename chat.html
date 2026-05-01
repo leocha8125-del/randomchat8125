@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Modern random chat world</title>
+    <style>
+        /* 기존 현대적 디자인 유지 */
+        body { font-family: 'Pretendard', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { width: 95%; max-width: 900px; height: 90vh; display: flex; flex-direction: column; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
+        .chat-header { padding: 20px; background: #fff; border-bottom: 1px solid #f1f3f5; font-weight: 800; font-size: 1.2rem; text-align: center; }
+        #chat-display { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+        .msg { max-width: 75%; padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; background-color: #f1f3f5; align-self: flex-start; }
+        .msg.me { background-color: #007bff; color: white; align-self: flex-end; }
+        .input-area { padding: 20px; border-top: 1px solid #f1f3f5; display: flex; gap: 12px; }
+        #message-input { flex-grow: 1; padding: 15px; border: 2px solid #e2e8f0; border-radius: 16px; outline: none; }
+        #send-btn { padding: 0 30px; background-color: #007bff; color: white; border: 2px solid #0056b3; border-radius: 16px; font-weight: 700; cursor: pointer; position: relative; box-shadow: 0 4px 0 #004a99; transition: all 0.05s; }
+        #send-btn:active, #send-btn.is-active { top: 4px; box-shadow: 0 0 0 #004a99; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="chat-header" id="welcome-msg">Modern random chat world</div>
+    <div id="chat-display"></div>
+    <div class="input-area">
+        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." autocomplete="off">
+        <button id="send-btn">전송</button>
+    </div>
+</div>
+
+<script>
+    const nickname = localStorage.getItem('chat_nickname') || 'Guest';
+    const nationality = localStorage.getItem('chat_nationality') || '??';
+    const display = document.getElementById('chat-display');
+    const input = document.getElementById('message-input');
+    const btn = document.getElementById('send-btn');
+
+    document.getElementById('welcome-msg').textContent = `Chat Room (${nickname} from ${nationality})`;
+
+    function sendMessage() {
+        const text = input.value.trim();
+        if (text !== "") {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg me';
+            msgDiv.textContent = text; // 본인 메시지는 닉네임 생략 가능
+            display.appendChild(msgDiv);
+            input.value = "";
+            display.scrollTop = display.scrollHeight;
+        }
+    }
+
+    btn.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            btn.classList.add('is-active');
+            sendMessage();
+            setTimeout(() => btn.classList.remove('is-active'), 100);
+        }
+    });
+</script>
+</body>
+</html>
