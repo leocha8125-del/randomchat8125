@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern random chat world</title>
     <style>
-        /* 현대적인 폰트와 배경 설정 */
         body { 
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,33 +15,29 @@
             margin: 0;
         }
         
-        /* 메인 컨테이너 */
         .container { 
             width: 95%; 
-            max-width: 900px; /* 너비를 조금 더 확장 */
+            max-width: 900px; 
             height: 85vh;
             display: flex;
             flex-direction: column;
             background: white;
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             overflow: hidden;
-            border: 1px solid #edf2f7;
+            border: 1px solid #eef0f2;
         }
 
-        /* 헤더 디자인 */
         .chat-header {
             padding: 24px;
-            background: #ffffff;
+            background: #fff;
             border-bottom: 1px solid #f1f3f5;
             font-weight: 800;
             font-size: 1.4rem;
             text-align: center;
             color: #1a202c;
-            letter-spacing: -0.5px;
         }
 
-        /* 채팅창 영역 */
         #chat-display {
             flex-grow: 1;
             padding: 25px;
@@ -53,76 +48,77 @@
             gap: 16px;
         }
 
-        /* 메시지 버블 스타일 */
         .msg {
             max-width: 75%;
             padding: 14px 20px;
             border-radius: 18px;
             font-size: 1rem;
             line-height: 1.6;
-            word-wrap: break-word;
             background-color: #f1f3f5;
             color: #2d3748;
             align-self: flex-start;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
 
-        /* 시스템/내 메시지 구분용 (추후 확장성) */
         .msg.me {
             background-color: #007bff;
             color: white;
             align-self: flex-end;
         }
 
-        /* 입력 영역 */
         .input-area {
             padding: 24px;
             background: #fff;
             border-top: 1px solid #f1f3f5;
             display: flex;
-            gap: 14px;
+            gap: 15px;
+            align-items: center;
         }
 
-        /* 입력창 디자인 */
         #message-input {
             flex-grow: 1;
-            padding: 16px 24px;
+            padding: 16px 20px;
             border: 2px solid #e2e8f0;
             border-radius: 16px;
             font-size: 1rem;
             outline: none;
-            transition: all 0.2s ease;
-        }
-        #message-input:focus {
-            border-color: #007bff;
-            background-color: #fdfdfd;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+            transition: border-color 0.2s;
         }
 
-        /* 전송 버튼 디자인 */
+        #message-input:focus {
+            border-color: #007bff;
+        }
+
+        /* 입체적 음영 버튼 스타일 */
         #send-btn {
             padding: 0 32px;
+            height: 54px;
             background-color: #007bff;
             color: white;
-            border: none;
+            border: 2px solid #0056b3;
             border-radius: 16px;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            top: 0;
+            /* 하단 음영으로 입체감 표현 */
+            box-shadow: 0 4px 0 #004a99;
+            transition: all 0.05s;
+            white-space: nowrap;
         }
 
+        /* 마우스를 올렸을 때 */
         #send-btn:hover {
+            background-color: #0069d9;
+        }
+
+        /* 버튼이 눌리는 효과 (클릭 시 혹은 클래스 추가 시) */
+        #send-btn:active, #send-btn.is-active {
+            top: 4px;
+            box-shadow: 0 0 0 #004a99;
             background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0, 123, 255, 0.25);
         }
 
-        #send-btn:active {
-            transform: translateY(0);
-        }
-
-        /* 스크롤바 디자인 */
         #chat-display::-webkit-scrollbar {
             width: 5px;
         }
@@ -138,11 +134,11 @@
     <div class="chat-header">Modern random chat world</div>
     
     <div id="chat-display">
-        <div class="msg"><b>System:</b> Welcome to the world! 대화를 시작해보세요.</div>
+        <div class="msg"><b>System:</b> 환영합니다! 입체적인 전송 버튼을 확인해보세요.</div>
     </div>
 
     <div class="input-area">
-        <input type="text" id="message-input" placeholder="이곳에 메시지를 입력하세요..." autocomplete="off">
+        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." autocomplete="off">
         <button id="send-btn">전송</button>
     </div>
 </div>
@@ -156,14 +152,12 @@
         const text = input.value.trim();
         if (text !== "") {
             const messageDiv = document.createElement('div');
-            // 내 메시지는 파란색으로 표시되도록 클래스 추가
             messageDiv.className = 'msg me';
-            messageDiv.innerHTML = `${text}`;
+            messageDiv.textContent = text;
             
             display.appendChild(messageDiv);
             input.value = "";
             
-            // 부드러운 하단 스크롤
             display.scrollTo({
                 top: display.scrollHeight,
                 behavior: 'smooth'
@@ -171,11 +165,21 @@
         }
     }
 
+    // 마우스 클릭 전송
     sendBtn.addEventListener('click', sendMessage);
 
+    // 키보드 엔터 전송 (버튼 눌림 효과 포함)
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+            // 버튼 눌림 효과 클래스 추가
+            sendBtn.classList.add('is-active');
+            
             sendMessage();
+
+            // 잠깐 뒤에 효과 제거
+            setTimeout(() => {
+                sendBtn.classList.remove('is-active');
+            }, 100);
         }
     });
 </script>
