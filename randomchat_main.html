@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>랜덤 채팅 메인화면</title>
+    <style>
+        /* 화면 전체 설정 */
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        
+        /* 메인 컨테이너 */
+        .container { width: 100%; max-width: 600px; }
+
+        /* 채팅 표시 화면 */
+        #chat-display {
+            width: 100%;
+            height: 400px;
+            border: 3px solid black;
+            margin-bottom: 10px;
+            overflow-y: scroll; /* 내용이 많아지면 스크롤 */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 입력창 영역 */
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 입력 박스 */
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 2px solid black;
+        }
+
+        /* 입력 버튼 */
+        #send-btn {
+            padding: 10px 20px;
+            border: 2px solid black;
+            background-color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="chat-display"></div>
+
+    <div class="input-area">
+        <input type="text" id="message-input" placeholder="채팅 내용을 입력하세요">
+        <button id="send-btn">입력 버튼</button>
+    </div>
+</div>
+
+<script>
+    // 버튼 클릭 이벤트
+    document.getElementById('send-btn').addEventListener('click', function() {
+        const input = document.getElementById('message-input');
+        const display = document.getElementById('chat-display');
+        
+        if (input.value.trim() !== "") {
+            // 메시지 생성
+            const message = document.createElement('div');
+            message.textContent = "나: " + input.value;
+            
+            // 채팅창에 추가
+            display.appendChild(message);
+            
+            // 입력창 초기화
+            input.value = "";
+            
+            // 스크롤 맨 아래로 이동
+            display.scrollTop = display.scrollHeight;
+        }
+    });
+
+    // 엔터키로도 입력 가능하게 설정
+    document.getElementById('message-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            document.getElementById('send-btn').click();
+        }
+    });
+</script>
+
+</body>
+</html>
