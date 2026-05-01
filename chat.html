@@ -25,7 +25,7 @@
     <div id="chat-display"></div>
     <div class="input-area">
         <input type="text" id="message-input" placeholder="메시지를 입력하세요..." autocomplete="off">
-        <button id="send-btn">전송</button>
+        <button id="send-btn">Input Message</button>
     </div>
 </div>
 
@@ -38,15 +38,22 @@
 
     document.getElementById('welcome-msg').textContent = `Chat Room (${nickname} from ${nationality})`;
 
+    // chat.html의 sendMessage 함수 내부
     function sendMessage() {
         const text = input.value.trim();
         if (text !== "") {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'msg me';
-            msgDiv.textContent = text; // 본인 메시지는 닉네임 생략 가능
-            display.appendChild(msgDiv);
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0]; 
+    
+            database.ref('messages/' + dateStr).push({
+                nickname: localStorage.getItem('chat_nickname'),
+                nationality: localStorage.getItem('chat_nationality'),
+                ip: localStorage.getItem('user_ip'), // 저장된 IP 추가
+                text: text,
+                timestamp: Date.now()
+            });
+            
             input.value = "";
-            display.scrollTop = display.scrollHeight;
         }
     }
 
