@@ -1,62 +1,124 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - Modern random chat world</title>
     <style>
-        /* 기존 현대적 디자인 유지 */
-        body { font-family: 'Pretendard', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { width: 95%; max-width: 900px; height: 90vh; display: flex; flex-direction: column; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
-        .chat-header { padding: 20px; background: #fff; border-bottom: 1px solid #f1f3f5; font-weight: 800; font-size: 1.2rem; text-align: center; }
-        #chat-display { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fff; }
-        .msg { max-width: 75%; padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; background-color: #f1f3f5; align-self: flex-start; }
-        .msg.me { background-color: #007bff; color: white; align-self: flex-end; }
-        .input-area { padding: 20px; border-top: 1px solid #f1f3f5; display: flex; gap: 12px; }
-        #message-input { flex-grow: 1; padding: 15px; border: 2px solid #e2e8f0; border-radius: 16px; outline: none; }
-        #send-btn { padding: 0 30px; background-color: #007bff; color: white; border: 2px solid #0056b3; border-radius: 16px; font-weight: 700; cursor: pointer; position: relative; box-shadow: 0 4px 0 #004a99; transition: all 0.05s; }
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { width: 95%; max-width: 900px; height: 90vh; display: flex; flex-direction: column; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eef0f2; }
+        
+        /* 헤더 스타일 */
+        .chat-header { padding: 20px; background: #fff; border-bottom: 1px solid #f1f3f5; font-weight: 800; font-size: 1.1rem; text-align: center; color: #1a202c; }
+        
+        #chat-display { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #ffffff; }
+        
+        /* 메시지 버블 스타일 */
+        .msg { max-width: 75%; padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; background-color: #f1f3f5; color: #2d3748; align-self: flex-start; position: relative; }
+        .msg .meta { font-size: 0.75rem; color: #718096; margin-bottom: 4px; display: block; font-weight: 600; }
+        
+        /* 내 메시지 스타일 (오른쪽 정렬) */
+        .msg.me { background-color: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .input-area { padding: 20px; background: #fff; border-top: 1px solid #f1f3f5; display: flex; gap: 12px; align-items: center; }
+        #message-input { flex-grow: 1; padding: 15px; border: 2px solid #e2e8f0; border-radius: 16px; outline: none; font-size: 1rem; transition: border-color 0.2s; }
+        #message-input:focus { border-color: #007bff; }
+
+        /* 입체적 전송 버튼 */
+        #send-btn { padding: 0 30px; height: 50px; background-color: #007bff; color: white; border: 2px solid #0056b3; border-radius: 16px; font-weight: 700; cursor: pointer; position: relative; box-shadow: 0 4px 0 #004a99; transition: all 0.05s; white-space: nowrap; }
         #send-btn:active, #send-btn.is-active { top: 4px; box-shadow: 0 0 0 #004a99; }
+
+        #chat-display::-webkit-scrollbar { width: 5px; }
+        #chat-display::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="chat-header" id="welcome-msg">Modern random chat world</div>
+    <!-- 헤더 정보 표시 -->
+    <div class="chat-header" id="room-info">Connecting to rdb1...</div>
     <div id="chat-display"></div>
     <div class="input-area">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." autocomplete="off">
-        <button id="send-btn">Input Message</button>
+        <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+        <button id="send-btn">Send</button>
     </div>
 </div>
 
 <script>
-    const nickname = localStorage.getItem('chat_nickname') || 'Guest';
-    const nationality = localStorage.getItem('chat_nationality') || '??';
     const display = document.getElementById('chat-display');
     const input = document.getElementById('message-input');
     const btn = document.getElementById('send-btn');
-
-    document.getElementById('welcome-msg').textContent = `Chat Room (${nickname} from ${nationality})`;
-
-    // chat.html의 sendMessage 함수 내부
-    function sendMessage() {
-        const text = input.value.trim();
-        if (text !== "") {
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0]; 
     
-            database.ref('messages/' + dateStr).push({
-                nickname: localStorage.getItem('chat_nickname'),
-                nationality: localStorage.getItem('chat_nationality'),
-                ip: localStorage.getItem('user_ip'), // 저장된 IP 추가
-                text: text,
-                timestamp: Date.now()
-            });
+    /* 로컬 스토리지 데이터 로드 */
+    const myNickname = localStorage.getItem('chat_nickname') || 'Anonymous';
+    const myNation = localStorage.getItem('chat_nationality') || '??';
+    const myIp = localStorage.getItem('user_ip') || '0.0.0.0';
+
+    document.getElementById('room-info').textContent = `Modern Chat - ${myNickname} (${myNation})`;
+
+    /* 1. 메시지 불러오기 (GET) */
+    async function loadMessages() {
+        try {
+            const res = await fetch('/api');
+            if (!res.ok) throw new Error('Network response was not ok');
+            const data = await res.json();
             
-            input.value = "";
+            /* 스크롤 위치 감지 */
+            const isAtBottom = display.scrollHeight - display.scrollTop <= display.clientHeight + 100;
+
+            display.innerHTML = ""; 
+            data.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                const isMe = msg.nickname === myNickname; 
+                
+                msgDiv.className = isMe ? 'msg me' : 'msg';
+                
+                /* 상대방 정보 표시 (닉네임 + 국가) */
+                const metaInfo = isMe ? "" : `<span class="meta">${msg.nickname} (${msg.nationality})</span>`;
+                msgDiv.innerHTML = `${metaInfo}${msg.message}`;
+                
+                display.appendChild(msgDiv);
+            });
+
+            /* 자동 스크롤 하단 이동 */
+            if (isAtBottom) {
+                display.scrollTop = display.scrollHeight;
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
         }
     }
 
+    /* 2. 메시지 전송하기 (POST) */
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (text === "") return;
+
+        const payload = {
+            nickname: myNickname,
+            nationality: myNation,
+            ip: myIp,
+            message: text
+        };
+
+        try {
+            const res = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                input.value = "";
+                await loadMessages(); /* 즉시 로드 */
+                display.scrollTop = display.scrollHeight;
+            }
+        } catch (err) {
+            alert("Error: Could not send message.");
+        }
+    }
+
+    /* 버튼 및 엔터키 이벤트 */
     btn.addEventListener('click', sendMessage);
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -65,6 +127,13 @@
             setTimeout(() => btn.classList.remove('is-active'), 100);
         }
     });
+
+    /* 3. 3초마다 Polling (실시간 업데이트 모방) */
+    setInterval(loadMessages, 3000);
+
+    /* 최초 실행 */
+    loadMessages();
 </script>
+
 </body>
 </html>
